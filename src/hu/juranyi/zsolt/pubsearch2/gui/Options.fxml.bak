@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import java.lang.*?>
+<?import java.util.*?>
+<?import javafx.geometry.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.paint.*?>
+<?scenebuilder-preview-i18n-resource Options.properties?>
+
+<AnchorPane id="AnchorPane" prefHeight="400.0" prefWidth="600.0" xmlns:fx="http://javafx.com/fxml" fx:controller="hu.juranyi.zsolt.pubsearch2.gui.OptionsController">
+  <children>
+    <TabPane tabClosingPolicy="UNAVAILABLE" AnchorPane.bottomAnchor="35.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+      <tabs>
+        <Tab text="%tab.crawlers">
+          <content>
+            <AnchorPane id="Content" minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
+              <children>
+                <Label text="Keresés a kiválasztott crawler-ekkel:" AnchorPane.leftAnchor="10.0" AnchorPane.topAnchor="10.0" />
+                <ScrollPane prefHeight="101.0" prefWidth="580.0" AnchorPane.bottomAnchor="10.0" AnchorPane.leftAnchor="10.0" AnchorPane.rightAnchor="10.0" AnchorPane.topAnchor="32.0">
+                  <content>
+                    <VBox fx:id="checkListContainer" spacing="10.0">
+                      <children>
+                        <CheckBox mnemonicParsing="false" text="PubSearch 1.x Crawler (integrated)" />
+                        <CheckBox mnemonicParsing="false" text="CheckBox" />
+                      </children>
+                      <padding>
+                        <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
+                      </padding>
+                    </VBox>
+                  </content>
+                </ScrollPane>
+              </children>
+            </AnchorPane>
+          </content>
+        </Tab>
+        <Tab text="%tab.network">
+          <content>
+            <AnchorPane id="Content" minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
+              <children>
+                <TextField layoutX="159.0" layoutY="68.0" prefWidth="28.0" text="0" />
+                <Label layoutX="24.0" layoutY="60.0" text="Lapok cachelése (napok):" />
+                <Label layoutX="65.0" layoutY="106.0" text="Proxy beállítások:  mely adatbázisoknál használjon, esetleg forrást valahogy" />
+                <Label layoutX="132.0" layoutY="177.0" text="Retry per proxy" />
+                <Label layoutX="132.0" layoutY="201.0" text="Retry with X proxy" />
+                <Label layoutX="132.0" layoutY="226.0" text="Fails needed to delete a proxy" />
+                <Label layoutX="14.0" layoutY="14.0" prefHeight="41.0" prefWidth="363.0" text="Az alábbi beállítások csak azon crawler-ekre vonatkoznak, amelyek a PubSearch beépített letöltésvezérlőjét használják." wrapText="true" />
+              </children>
+            </AnchorPane>
+          </content>
+        </Tab>
+        <Tab text="Adatok tárolása">
+          <content>
+            <AnchorPane id="Content" minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
+              <children>
+                <GridPane layoutX="15.0" layoutY="15.0">
+                  <children>
+                    <Label text="Szerver" GridPane.columnIndex="0" GridPane.rowIndex="0" />
+                    <TextField prefWidth="200.0" promptText="127.0.0.1:3306" GridPane.columnIndex="1" GridPane.rowIndex="0" />
+                    <Label text="Adatbázis" GridPane.columnIndex="0" GridPane.rowIndex="1" />
+                    <Label text="Felhasználó" GridPane.columnIndex="0" GridPane.rowIndex="2" />
+                    <Label text="Jelszó" GridPane.columnIndex="0" GridPane.rowIndex="3" />
+                    <TextField prefWidth="200.0" promptText="pubsearch" GridPane.columnIndex="1" GridPane.rowIndex="1" />
+                    <TextField prefWidth="200.0" promptText="root" GridPane.columnIndex="1" GridPane.rowIndex="2" />
+                    <PasswordField prefWidth="200.0" GridPane.columnIndex="1" GridPane.rowIndex="3" />
+                  </children>
+                  <columnConstraints>
+                    <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
+                    <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
+                  </columnConstraints>
+                  <rowConstraints>
+                    <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                    <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                    <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                    <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                  </rowConstraints>
+                </GridPane>
+              </children>
+            </AnchorPane>
+          </content>
+        </Tab>
+      </tabs>
+    </TabPane>
+    <Button maxWidth="-Infinity" mnemonicParsing="false" prefWidth="77.0" text="%save" AnchorPane.bottomAnchor="10.0" AnchorPane.leftAnchor="262.0" AnchorPane.rightAnchor="261.0" />
+  </children>
+</AnchorPane>

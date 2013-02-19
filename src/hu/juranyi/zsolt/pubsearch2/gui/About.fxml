@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import java.lang.*?>
+<?import java.util.*?>
+<?import javafx.geometry.*?>
+<?import javafx.scene.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.text.*?>
+
+<AnchorPane id="AnchorPane" prefHeight="250.0" prefWidth="400.0" xmlns:fx="http://javafx.com/fxml" fx:controller="hu.juranyi.zsolt.pubsearch2.gui.AboutController">
+  <children>
+    <Label layoutX="14.0" layoutY="14.0" text="PubSearch">
+      <font>
+        <Font name="System Bold Italic" size="32.0" />
+      </font>
+    </Label>
+    <Label layoutX="186.0" layoutY="14.0" text="Version 2.0">
+      <font>
+        <Font name="System Bold" size="12.0" />
+      </font>
+    </Label>
+    <Label layoutX="14.0" layoutY="57.0" text="by Zsolt Jurányi">
+      <font>
+        <Font name="System Bold Italic" size="18.0" />
+      </font>
+    </Label>
+    <VBox layoutX="14.0" layoutY="81.0" prefHeight="155.0" prefWidth="372.0" spacing="5.0">
+      <children>
+        <Hyperlink onAction="#mail" text="zsolt.juranyi@gmail.com" />
+        <Hyperlink onAction="#bloghu" text="http://juzraai.blogspot.hu" />
+        <Hyperlink onAction="#blogen" text="http://juzraai-en.blogspot.com" />
+        <Hyperlink onAction="#sourceforge" text="&lt;SourceForge-Project-Page&gt;" />
+      </children>
+      <padding>
+        <Insets top="10.0" />
+      </padding>
+    </VBox>
+  </children>
+</AnchorPane>
