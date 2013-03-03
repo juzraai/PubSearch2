@@ -11,7 +11,7 @@ import java.util.List;
  *
  * @author Zsolt
  */
-public class ResultTableEntry {
+public class ResultInfo {
 
     private final IPubData pubData;
     private final String crawlerName;
@@ -20,7 +20,7 @@ public class ResultTableEntry {
     private final String year;
     private final int citedByCount;
 
-    public ResultTableEntry(IPubData pubData, String crawlerName) {
+    public ResultInfo(IPubData pubData, String crawlerName) {
         this.pubData = pubData;
         this.crawlerName = crawlerName;
         StringBuilder buf = new StringBuilder();

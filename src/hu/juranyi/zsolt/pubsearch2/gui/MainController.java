@@ -5,14 +5,17 @@
  */
 package hu.juranyi.zsolt.pubsearch2.gui;
 
+import hu.juranyi.zsolt.pubsearch2.PubSearch2;
 import hu.juranyi.zsolt.pubsearch2.core.CrawlerHandler;
-import hu.juranyi.zsolt.pubsearch2.core.CrawlerProgressInfo;
-import hu.juranyi.zsolt.pubsearch2.core.CrawlerRunner;
+import hu.juranyi.zsolt.pubsearch2.core.ProgressInfo;
 import hu.juranyi.zsolt.pubsearch2.core.ProgressUpdater;
 import hu.juranyi.zsolt.pubsearch2.interfaces.IPubData;
 import java.net.URL;
 import java.util.List;
 import java.util.ResourceBundle;
+import javafx.application.Platform;
+import javafx.beans.value.ChangeListener;
+import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
@@ -30,8 +33,10 @@ import javafx.scene.control.TabPane;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TextField;
+import javafx.scene.control.cell.ProgressBarTableCell;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.input.KeyEvent;
+import javafx.scene.text.Font;
 
 public class MainController
         implements Initializable {
@@ -51,15 +56,15 @@ public class MainController
     @FXML //  fx:id="progressBar"
     private ProgressBar progressBar; // Value injected by FXMLLoader
     @FXML //  fx:id="progressCrawlerColumn"
-    private TableColumn<CrawlerProgressInfo, String> progressCrawlerColumn; // Value injected by FXMLLoader
+    private TableColumn<ProgressInfo, String> progressCrawlerColumn; // Value injected by FXMLLoader
     @FXML //  fx:id="progressPercentColumn"
-    private TableColumn<CrawlerProgressInfo, String> progressPercentColumn; // Value injected by FXMLLoader
+    private TableColumn progressPercentColumn; // Value injected by FXMLLoader
     @FXML //  fx:id="progressTab"
     private Tab progressTab; // Value injected by FXMLLoader
     @FXML //  fx:id="progressTable"
-    private TableView<CrawlerProgressInfo> progressTable; // Value injected by FXMLLoader
+    private TableView<ProgressInfo> progressTable; // Value injected by FXMLLoader
     @FXML //  fx:id="progressTextColumn"
-    private TableColumn<CrawlerProgressInfo, String> progressTextColumn; // Value injected by FXMLLoader
+    private TableColumn<ProgressInfo, String> progressTextColumn; // Value injected by FXMLLoader
     @FXML //  fx:id="queryButton"
     private Button queryButton; // Value injected by FXMLLoader
     @FXML //  fx:id="resultsPieChart"
@@ -74,7 +79,6 @@ public class MainController
     private Tab searchTab; // Value injected by FXMLLoader
     @FXML //  fx:id="startButton"
     private Button startButton; // Value injected by FXMLLoader
-    @FXML //  fx:id="statsTab"
     private Tab statsTab; // Value injected by FXMLLoader
     @FXML //  fx:id="tabs"
     private TabPane tabs; // Value injected by FXMLLoader
@@ -82,35 +86,48 @@ public class MainController
     private TextField titleField; // Value injected by FXMLLoader
     @FXML //  fx:id="transLevCombo"
     private ComboBox<?> transLevCombo; // Value injected by FXMLLoader
+    @FXML
+    private Font x1;
+    @FXML
+    private Tab resultsSubTab;
+    @FXML
+    private Tab statsSubTab;
 
     // Handler for MenuItem[fx:id="about"] onAction
+    @FXML
     public void about(ActionEvent event) {
         // handle the event here
     }
 
     // Handler for Button[fx:id="queryButton"] onAction
+    @FXML
     public void query(ActionEvent event) {
         // handle the event here
     }
 
     // Handler for TextField[fx:id="authorField"] onKeyPressed
     // Handler for TextField[fx:id="titleField"] onKeyPressed
+    @FXML
     public void refreshFormControls(KeyEvent event) {
         titleField.setDisable(authorField.getText().length() == 0);
         startButton.setDisable(authorField.getText().length() == 0 || CrawlerHandler.getEnabledCount() == 0);
     }
 
     // Handler for MenuItem[javafx.scene.control.MenuItem@18debd3] onAction
+    @FXML
     public void settings(ActionEvent event) {
         // handle the event here
     }
 
     // Handler for Button[fx:id="startButton"] onAction
-    public void start(ActionEvent event) {
+    @FXML
+    public void start(ActionEvent event) { // TODO kitalálni a
+        //tabs.getTabs().add(progressTab);
         tabs.getSelectionModel().select(progressTab);
-        searchTab.disableProperty().set(true);
-        resultsTab.disableProperty().set(true);
-        statsTab.disableProperty().set(true);
+        /*searchTab.disableProperty().set(true);
+         resultsTab.disableProperty().set(true);
+         statsTab.disableProperty().set(true);*/
+        tabs.getTabs().removeAll(searchTab, resultsTab, statsTab);
         Thread t = new Thread(new Runnable() {
             @Override
             public void run() {
@@ -118,17 +135,26 @@ public class MainController
                 ProgressUpdater progressUpdater = new ProgressUpdater(MainController.this);
                 progressUpdater.start();
 
-                List<IPubData> results = CrawlerRunner.runCrawlers(authorField.getText(), titleField.getText(), transLevCombo.selectionModelProperty().get().getSelectedIndex(), (int) crawlerThreadsSlider.getValue(), (int) insideThreadsSlider.getValue());
+                List<IPubData> results = CrawlerHandler.runCrawlers(authorField.getText(), titleField.getText(), transLevCombo.selectionModelProperty().get().getSelectedIndex(), (int) crawlerThreadsSlider.getValue(), (int) insideThreadsSlider.getValue());
 
                 progressUpdater.interrupt();
                 updateProgress();
 
                 resultsTable.setItems(FXCollections.observableArrayList(results));
                 //TODO stats data pass
-                resultsTab.disableProperty().set(false);
-                searchTab.disableProperty().set(false);
-                statsTab.disableProperty().set(false);
-                tabs.getSelectionModel().select(resultsTab);
+                /*resultsTab.disableProperty().set(false);
+                 searchTab.disableProperty().set(false);
+                 statsTab.disableProperty().set(false);*/
+                Platform.runLater(new Runnable() {
+                    @Override
+                    public void run() {
+                        // TODO add and select result tab
+                        //tabs.getTabs().addAll(searchTab, resultsTab, statsTab);
+                        //tabs.getSelectionModel().select(resultsTab);
+                    }
+                });
+
+
             }
         });
         t.setName("Crawler runner");
@@ -162,17 +188,26 @@ public class MainController
         assert transLevCombo != null : "fx:id=\"transLevCombo\" was not injected: check your FXML file 'Main.fxml'.";
 
         // initialize your logic here: all @FXML variables will have been injected
+        tabs.getSelectionModel().selectedItemProperty().addListener(new ChangeListener<Tab>() {
+            @Override
+            public void changed(ObservableValue<? extends Tab> ov, Tab t, Tab t1) {
+                PubSearch2.window.setTitle("PubSearch 2 - " + t1.getText());
+            }
+        });
 
 
+        //tabs.getTabs().removeAll(...); // TODO remove not needed tabs
 
-        progressCrawlerColumn.setCellValueFactory(new PropertyValueFactory<CrawlerProgressInfo, String>("crawlerName"));
-        progressTextColumn.setCellValueFactory(new PropertyValueFactory<CrawlerProgressInfo, String>("progressText"));
-        progressPercentColumn.setCellValueFactory(new PropertyValueFactory<CrawlerProgressInfo, String>("progressPercent"));
+
+        progressCrawlerColumn.setCellValueFactory(new PropertyValueFactory<ProgressInfo, String>("crawlerName"));
+        progressTextColumn.setCellValueFactory(new PropertyValueFactory<ProgressInfo, String>("progressText"));
+        progressPercentColumn.setCellValueFactory(new PropertyValueFactory<ProgressInfo, Double>("progressPercent"));
+        progressPercentColumn.setCellFactory(ProgressBarTableCell.forTableColumn());
     }
 
     public void updateProgress() {
-        ObservableList<CrawlerProgressInfo> crawlerList = FXCollections.observableArrayList(CrawlerRunner.getCrawlerProgressInfos());
+        ObservableList<ProgressInfo> crawlerList = FXCollections.observableArrayList(CrawlerHandler.getProgressInfos());
         progressTable.setItems(crawlerList);
-        progressBar.progressProperty().set(CrawlerRunner.getOverallProgressPercent());
+        progressBar.progressProperty().set(CrawlerHandler.getOverallProgressPercent());
     }
 }

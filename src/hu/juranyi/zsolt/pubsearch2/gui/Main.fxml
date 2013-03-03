@@ -17,6 +17,8 @@
       <menus>
         <Menu mnemonicParsing="false" text="PubSearch">
           <items>
+            <MenuItem mnemonicParsing="false" text="Új böngészőfül" />
+            <MenuItem mnemonicParsing="false" text="Új keresés" />
             <MenuItem mnemonicParsing="false" onAction="#settings" text="Beállítások" />
           </items>
         </Menu>
@@ -32,18 +34,24 @@
         </Menu>
       </menus>
     </MenuBar>
-    <TabPane id="tabPane" fx:id="tabs" prefHeight="376.0" prefWidth="600.0" tabClosingPolicy="ALL_TABS" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="24.0">
+    <TabPane id="tabPane" fx:id="tabs" prefHeight="376.0" prefWidth="600.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="24.0">
       <tabs>
-        <Tab closable="false" text="Állapot">
-          <content>
-            <AnchorPane id="Content" minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0" />
-          </content>
-        </Tab>
-        <Tab fx:id="browseTab" closable="false" disable="true" style="" text="Böngészés">
+        <Tab text="%intro.introduction">
           <content>
             <AnchorPane id="Content" minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
               <children>
-                <TableView fx:id="browseTable" prefHeight="300.0" prefWidth="580.0" AnchorPane.bottomAnchor="10.0" AnchorPane.leftAnchor="10.0" AnchorPane.rightAnchor="10.0" AnchorPane.topAnchor="100.0">
+                <Label layoutX="55.0" layoutY="49.0" text="Némi leírás, súgó, mit lehet csinálni" />
+                <Label layoutX="55.0" layoutY="76.0" text="Browse, New search, Settings button" />
+                <Label layoutX="55.0" layoutY="108.0" text="Esetleg státusz (mi van beállítva)" />
+              </children>
+            </AnchorPane>
+          </content>
+        </Tab>
+        <Tab fx:id="browseTab" style="" text="Böngészés">
+          <content>
+            <AnchorPane id="Content" minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
+              <children>
+                <TableView fx:id="browseTable" prefHeight="195.0" prefWidth="580.0" AnchorPane.bottomAnchor="40.0" AnchorPane.leftAnchor="10.0" AnchorPane.rightAnchor="10.0" AnchorPane.topAnchor="100.0">
                   <columns>
                     <TableColumn editable="false" minWidth="100.0" prefWidth="100.0" text="Keresőmotor" />
                     <TableColumn editable="false" minWidth="200.0" prefWidth="200.0" text="Szerzők" />
@@ -52,11 +60,18 @@
                   </columns>
                 </TableView>
                 <Button fx:id="queryButton" layoutX="508.0" layoutY="49.0" mnemonicParsing="false" onAction="#query" text="Lekérdezés" />
+                <Label layoutX="94.0" layoutY="44.0" text="Szűrési paraméterek:" />
+                <HBox alignment="BOTTOM_CENTER" spacing="10.0" AnchorPane.bottomAnchor="10.0" AnchorPane.leftAnchor="10.0" AnchorPane.rightAnchor="10.0">
+                  <children>
+                    <Button mnemonicParsing="false" text="Kijelölt publikációk összevonása..." textAlignment="CENTER" wrapText="true" />
+                    <Button mnemonicParsing="false" text="Fenti publikációk automatikus összevonása" textAlignment="CENTER" wrapText="true" />
+                  </children>
+                </HBox>
               </children>
             </AnchorPane>
           </content>
         </Tab>
-        <Tab fx:id="searchTab" closable="false" text="Új keresés">
+        <Tab fx:id="searchTab" text="Új keresés">
           <content>
             <AnchorPane id="Content" minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
               <children>
@@ -118,7 +133,7 @@
             </AnchorPane>
           </content>
         </Tab>
-        <Tab fx:id="progressTab" closable="false" text="Folyamat">
+        <Tab fx:id="progressTab" text="Folyamat">
           <content>
             <AnchorPane id="Content" minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
               <children>
@@ -134,30 +149,48 @@
             </AnchorPane>
           </content>
         </Tab>
-        <Tab fx:id="resultsTab" closable="false" text="Eredmény">
+        <Tab fx:id="resultsTab" text="*Eredmény">
           <content>
             <AnchorPane id="Content" minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
               <children>
-                <Label fx:id="resultsText" text="\%i találat (szerző: &quot;%s&quot;, cím: &quot;%s&quot;, tranz. szint: %i)" AnchorPane.leftAnchor="10.0" AnchorPane.rightAnchor="10.0" AnchorPane.topAnchor="10.0" />
-                <TableView fx:id="resultsTable" AnchorPane.bottomAnchor="10.0" AnchorPane.leftAnchor="10.0" AnchorPane.rightAnchor="10.0" AnchorPane.topAnchor="35.0">
-                  <columns>
-                    <TableColumn editable="false" minWidth="100.0" prefWidth="100.0" text="Keresőmotor" />
-                    <TableColumn editable="false" minWidth="200.0" prefWidth="200.0" text="Szerzők" />
-                    <TableColumn editable="false" minWidth="200.0" prefWidth="200.0" text="Cím" />
-                    <TableColumn editable="false" minWidth="50.0" prefWidth="75.0" text="Hivatkozók" />
-                  </columns>
-                </TableView>
+                <TabPane prefHeight="200.0" prefWidth="200.0" side="BOTTOM" tabClosingPolicy="UNAVAILABLE" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+                  <tabs>
+                    <Tab fx:id="resultsSubTab" closable="false" text="Eredmény">
+                      <content>
+                        <AnchorPane id="Content" minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
+                          <children>
+                            <Label fx:id="resultsText" text="\%i találat (szerző: &quot;%s&quot;, cím: &quot;%s&quot;, tranz. szint: %i)" AnchorPane.leftAnchor="10.0" AnchorPane.rightAnchor="10.0" AnchorPane.topAnchor="10.0" />
+                            <TableView fx:id="resultsTable" AnchorPane.bottomAnchor="10.0" AnchorPane.leftAnchor="10.0" AnchorPane.rightAnchor="10.0" AnchorPane.topAnchor="35.0">
+                              <columns>
+                                <TableColumn editable="false" minWidth="100.0" prefWidth="100.0" text="Keresőmotor" />
+                                <TableColumn editable="false" minWidth="200.0" prefWidth="200.0" text="Szerzők" />
+                                <TableColumn editable="false" minWidth="200.0" prefWidth="200.0" text="Cím" />
+                                <TableColumn prefWidth="75.0" text="Év" />
+                                <TableColumn editable="false" minWidth="50.0" prefWidth="75.0" text="Hivatkozók" />
+                              </columns>
+                            </TableView>
+                          </children>
+                        </AnchorPane>
+                      </content>
+                    </Tab>
+                    <Tab fx:id="statsSubTab" closable="false" text="Statisztika">
+                      <content>
+                        <AnchorPane id="Content" minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
+                          <children>
+                            <PieChart id="PieChart" fx:id="resultsPieChart" animated="false" labelsVisible="false" legendSide="RIGHT" title="Találatok keresőmotoronként" AnchorPane.bottomAnchor="10.0" AnchorPane.leftAnchor="10.0" AnchorPane.rightAnchor="10.0" AnchorPane.topAnchor="10.0" />
+                          </children>
+                        </AnchorPane>
+                      </content>
+                    </Tab>
+                  </tabs>
+                </TabPane>
               </children>
             </AnchorPane>
           </content>
         </Tab>
-        <Tab fx:id="statsTab" closable="false" text="Statisztika">
+        <Tab text="*Publikáció">
           <content>
-            <AnchorPane id="Content" minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
-              <children>
-                <PieChart id="PieChart" fx:id="resultsPieChart" animated="false" labelsVisible="false" legendSide="RIGHT" title="Találatok keresőmotoronként" AnchorPane.bottomAnchor="10.0" AnchorPane.leftAnchor="10.0" AnchorPane.rightAnchor="10.0" AnchorPane.topAnchor="10.0" />
-              </children>
-            </AnchorPane>
+            <AnchorPane id="Content" minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0" />
           </content>
         </Tab>
       </tabs>

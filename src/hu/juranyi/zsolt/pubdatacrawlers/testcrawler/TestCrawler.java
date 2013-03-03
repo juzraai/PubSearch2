@@ -14,7 +14,7 @@ import java.util.logging.Logger;
 public class TestCrawler implements IPubDataCrawler {
 
     // meta
-    private final String crawlerName = "Test Crawler";
+    private String crawlerName = "Test Crawler";
     private final boolean hasOwnDownloader = false;
     // init
     private String author;
@@ -28,6 +28,17 @@ public class TestCrawler implements IPubDataCrawler {
     // result
     private String errorMessage;
     private List<IPubData> publications;
+    // internal
+    private int interval;
+
+    public TestCrawler() {
+        this(150);
+    }
+
+    public TestCrawler(int interval) {
+        this.interval = interval;
+        crawlerName += "(i=" + interval + ")";
+    }
 
     @Override
     public String getCrawlerName() {
@@ -94,7 +105,7 @@ public class TestCrawler implements IPubDataCrawler {
             progressPercent = (100 - i) / 100.0;
             System.out.println("Test crawler: " + progressPercent + "%");
             try {
-                Thread.sleep(150);
+                Thread.sleep(interval);
             } catch (InterruptedException ex) {
                 errorMessage = "Interrupted.";
                 break;

@@ -23,6 +23,7 @@ import javafx.stage.WindowEvent;
 public class PubSearch2 extends Application {
 
     public static final String VERSION = "2.0.0";
+    public static Stage window;
 
     @Override
     public void start(Stage stage) throws Exception {
@@ -31,16 +32,15 @@ public class PubSearch2 extends Application {
             Parent root = FXMLLoader.load(MainController.class.getResource("Main.fxml"), ResourceBundle.getBundle("hu.juranyi.zsolt.pubsearch2.gui.Main"));
             Scene scene = new Scene(root);
             stage.setScene(scene);
-            stage.setTitle("PubSearch 2 by Zsolt Jurányi");
             stage.centerOnScreen();
             stage.onCloseRequestProperty().setValue(new EventHandler<WindowEvent>() {
-
                 @Override
                 public void handle(WindowEvent t) {
                     Platform.exit();
                     System.exit(0);
                 }
             });
+            window = stage;
             stage.show();
         } else {
             PubSearch2CLI.main(getParameters().getRaw());
@@ -51,10 +51,10 @@ public class PubSearch2 extends Application {
     private void initPubSearch2() {
         CrawlerHandler.lookupCrawlers();
         CrawlerHandler.loadCrawlerConfiguration();
-        
+
         // TODO load config
         // TODO Database.connect(<config>)
-        
+
     }
 
     /**

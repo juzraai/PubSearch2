@@ -24,7 +24,18 @@ public class PubSearch2CLI {
         // TODO kipróbálni, hogy "a=b", "-a=b", "--a=b" is bekerül-e így a raw-ba
         // TODO meg megnézhetjük, hogy a named-be bekerül-e és hogyan használható
         // TODO parse parameters
-        // TODO print usage on fail - még ki is kell találni:) (batch, meg mi még?)        
+        // TODO print usage on fail - még ki is kell találni:) (batch, meg mi még?)
+        /*
+         * Paraméterek: java -jar PubSearch2.jar <MODE> <PARAMETERS>
+         * MODES:
+         * - crawl authors=<filename> [export [skipdb]]
+         * - - más nem kell, többi beállítás (mysql, threadcounts, translev) a configban van
+         * - - exportálás authoronként, csv-be, crawl-YYYYMMDD-HHMM mappába, author.csv fájlokba, authorname-ből a pontot kivenni
+         * - - DE A CITEDBY-OKAT HOGY EXPORTÁLOM BELE A CSV-BE?
+         * - help
+         * - - usage info, leírás?
+         * 
+         */
     }
 
     private static void line(char c) {

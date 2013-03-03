@@ -4,13 +4,13 @@ package hu.juranyi.zsolt.pubsearch2.core;
  *
  * @author Zsolt
  */
-public class CrawlerProgressInfo {
+public class ProgressInfo {
 
     private String crawlerName;
     private String progressText;
-    private String progressPercent;
+    private Double progressPercent;
 
-    public CrawlerProgressInfo(Crawler crawler) {
+    public ProgressInfo(Crawler crawler) {
         crawlerName = crawler.getInstance().getCrawlerName();
 
         if (crawler.isRunning()) {
@@ -20,11 +20,7 @@ public class CrawlerProgressInfo {
         }
         progressText = (null == progressText) ? "" : progressText;
 
-        if (null == crawler.getInstance().getProgressPercent()) {
-            progressPercent = "";
-        } else {
-            progressPercent = String.format("%.1f", (crawler.getInstance().getProgressPercent()) * 100.0) + " %";
-        }
+        progressPercent = crawler.getInstance().getProgressPercent();
     }
 
     public String getCrawlerName() {
@@ -35,7 +31,7 @@ public class CrawlerProgressInfo {
         return progressText;
     }
 
-    public String getProgressPercent() {
+    public Double getProgressPercent() {
         return progressPercent;
     }
 }

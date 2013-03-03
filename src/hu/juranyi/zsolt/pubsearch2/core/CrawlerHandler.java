@@ -2,7 +2,9 @@ package hu.juranyi.zsolt.pubsearch2.core;
 
 import hu.juranyi.zsolt.pubdatacrawlers.pubsearch1x.PubSearch1xCrawler;
 import hu.juranyi.zsolt.pubdatacrawlers.testcrawler.TestCrawler;
+import hu.juranyi.zsolt.pubsearch2.interfaces.IPubData;
 import hu.juranyi.zsolt.pubsearch2.interfaces.IPubDataCrawler;
+import hu.juranyi.zsolt.pubsearch2.network.Downloader;
 import hu.juranyi.zsolt.util.TextFile;
 import java.io.File;
 import java.io.IOException;
@@ -15,14 +17,20 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.Enumeration;
 import java.util.List;
+import java.util.concurrent.Callable;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
 import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
 
 /**
  * Scans for crawler libraries in "crawlers" directory, loads and stores the
- * crawler classes, and handles their configuration.
+ * crawler classes, handles their configuration, and runs them providing
+ * progress information.
  *
- * @author Zsolt
+ * @author Zsolt Jurányi
  */
 public class CrawlerHandler {
 
@@ -30,41 +38,60 @@ public class CrawlerHandler {
     private static final String CRAWLERS_CONFIG_FILE = CRAWLERS_DIRECTORY + "crawlers.cfg";
     private static final List<Crawler> crawlers = new ArrayList<Crawler>();
 
+    private static class CrawlerTask implements Callable<List<IPubData>> {
+
+        private Crawler crawler;
+
+        public CrawlerTask(Crawler crawler) {
+            this.crawler = crawler;
+        }
+
+        @Override
+        public List<IPubData> call() throws Exception {
+            crawler.setRunning(true);
+            crawler.getInstance().run();
+            crawler.setRunning(false);
+            return (null == crawler.getInstance().getPublications()) ? new ArrayList<IPubData>() : crawler.getInstance().getPublications();
+        }
+    }
+
     public static void lookupCrawlers() {
         System.out.print("Scanning for crawlers... ");
         crawlers.clear();
 
         // scan jars for IPubDataCrawler implementations
         File crawlersDir = new File(CRAWLERS_DIRECTORY);
-        for (String fileName : crawlersDir.list()) {
-            if (fileName.endsWith(".jar")) {
-                try {
-                    JarFile jar = new JarFile(CRAWLERS_DIRECTORY + fileName);
-                    Enumeration e = jar.entries();
-                    while (e.hasMoreElements()) {
-                        JarEntry entry = (JarEntry) e.nextElement();
-                        if (entry.getName().endsWith(".class")) {
-                            String className = entry.getName().replaceFirst("\\.class", "").replaceAll("/", ".");
-                            IPubDataCrawler crawler = loadCrawler(CRAWLERS_DIRECTORY + fileName, className);
-                            if (null != crawler) {
-                                // verify crawler
-                                if (crawler.getCrawlerName() != null) {
-                                    crawlers.add(new Crawler(crawler, CRAWLERS_DIRECTORY + fileName, className, false, false));
+        if (null != crawlersDir.list()) {
+            for (String fileName : crawlersDir.list()) {
+                if (fileName.endsWith(".jar")) {
+                    try {
+                        JarFile jar = new JarFile(CRAWLERS_DIRECTORY + fileName);
+                        Enumeration e = jar.entries();
+                        while (e.hasMoreElements()) {
+                            JarEntry entry = (JarEntry) e.nextElement();
+                            if (entry.getName().endsWith(".class")) {
+                                String className = entry.getName().replaceFirst("\\.class", "").replaceAll("/", ".");
+                                IPubDataCrawler crawler = loadCrawler(CRAWLERS_DIRECTORY + fileName, className);
+                                if (null != crawler) {
+                                    // verify crawler
+                                    if (crawler.getCrawlerName() != null) {
+                                        crawlers.add(new Crawler(crawler, CRAWLERS_DIRECTORY + fileName, className, false, false));
+                                    }
                                 }
-                            }
-                        } // class files
-                    } // jar entries
-                } catch (IOException ex) {
-                } // jar read errors
-            } // jar files
-        } // files
+                            } // class files
+                        } // jar entries
+                    } catch (IOException ex) {
+                    } // jar read errors
+                } // jar files
+            } // files
+        }
 
         // add embedded PubSearch 1.x Crawler
         crawlers.add(new Crawler(new PubSearch1xCrawler(), null, PubSearch1xCrawler.class.getName(), false, false));
 
         // TODO TestCrawler inject, kivenni
         crawlers.add(new Crawler(new TestCrawler(), null, TestCrawler.class.getName(), true, false));
-        // TODO akár betehetnék még egy TestCrawler-t... és konstruktorparaméterben lehetne a sleep interval
+        crawlers.add(new Crawler(new TestCrawler(200), null, TestCrawler.class.getName(), true, false));
 
         // output loaded crawlers
         Collections.sort(crawlers, new Comparator<Crawler>() {
@@ -139,6 +166,46 @@ public class CrawlerHandler {
         return f.save();
     }
 
+    public static List<IPubData> runCrawlers(String author, String title, int transLev, int crawlerThreads, int insideThreads) {
+
+        // build crawler tasks
+        List<CrawlerTask> crawlerTasks = new ArrayList<CrawlerTask>();
+        for (Crawler crawler : CrawlerHandler.getCrawlers()) {
+            if (crawler.getEnabled()) {
+
+                // initialize crawler
+                crawler.getInstance().setAuthor(author);
+                crawler.getInstance().setTitle(title);
+                crawler.getInstance().setThreadCount(insideThreads);
+                crawler.getInstance().setTransitivityLevel(transLev);
+                if (!crawler.getInstance().hasOwnDownloader()) {
+                    crawler.getInstance().setDownloader(new Downloader());
+                }
+
+                // build crawler task
+                crawlerTasks.add(new CrawlerTask(crawler));
+            }
+        }
+
+        // execute crawlers in thread pool
+        ExecutorService threadPool = Executors.newFixedThreadPool(crawlerThreads);
+        List<Future<List<IPubData>>> executionResults = null;
+        try {
+            executionResults = threadPool.invokeAll(crawlerTasks);
+        } catch (InterruptedException ex) {
+        }
+
+        // gather crawled publications
+        List<IPubData> results = new ArrayList<IPubData>();
+        for (Future<List<IPubData>> executionResult : executionResults) {
+            try {
+                results.addAll(executionResult.get());
+            } catch (InterruptedException | ExecutionException ex) {
+            }
+        }
+        return results;
+    }
+
     public static List<Crawler> getCrawlers() {
         return crawlers;
     }
@@ -151,5 +218,28 @@ public class CrawlerHandler {
             }
         }
         return c;
+    }
+
+    public static List<ProgressInfo> getProgressInfos() {
+        List<ProgressInfo> crawlerProgressInfos = new ArrayList<ProgressInfo>();
+        for (Crawler crawler : CrawlerHandler.getCrawlers()) {
+            if (crawler.getEnabled()) {
+                crawlerProgressInfos.add(new ProgressInfo(crawler));
+            }
+        }
+        return crawlerProgressInfos;
+    }
+
+    public static double getOverallProgressPercent() {
+        double sum = 0.0;
+        int count = 0;
+        for (Crawler crawler : CrawlerHandler.getCrawlers()) {
+            if (crawler.getEnabled()) {
+                Double current = crawler.getInstance().getProgressPercent();
+                sum += (null == current) ? 0.0 : current;
+                count++;
+            }
+        }
+        return sum / count;
     }
 }
